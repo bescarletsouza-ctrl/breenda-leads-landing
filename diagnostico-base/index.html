@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diagnóstico de Eficiência Operacional — BASE</title>
+<meta name="description" content="Descubra o nível de caos operacional da sua empresa de serviços e o quanto ele custa. Diagnóstico gratuito em 4 minutos." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0A0A;
+    --paper:#FFFFFF;
+    --bone:#F5F3F0;
+    --bone-2:#ECE8E2;
+    --line:#E3DED6;
+    --line-ink:rgba(10,10,10,.12);
+    --muted:#6B665E;
+    --orange:#FF5310;
+    --orange-deep:#E23E00;
+    --orange-tint:#FFEDE4;
+    --focus:#0A0A0A;
+    --shadow:0 24px 60px -20px rgba(10,10,10,.28);
+    --shadow-sm:0 2px 0 rgba(10,10,10,.9);
+    --display:'Bricolage Grotesque', system-ui, sans-serif;
+    --body:'Inter', system-ui, sans-serif;
+    --wrap:1120px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;font-family:var(--body);color:var(--ink);background:var(--paper);
+    line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:-.02em;margin:0}
+  p{margin:0}
+  a{color:inherit}
+  button{font-family:inherit}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+  .eyebrow{
+    font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:2px;background:var(--orange);display:inline-block}
+  .accent{color:var(--orange)}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* ---------- Logo mark ---------- */
+  .mark{width:34px;height:34px;flex:none}
+  .mark rect{fill:var(--ink)}
+  .mark circle{fill:var(--paper);stroke:var(--ink);stroke-width:8}
+  .mark.on-dark rect{fill:var(--paper)}
+  .mark.on-dark circle{fill:var(--ink);stroke:var(--paper)}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand-word{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.02em;line-height:1}
+  .brand-tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.01em;
+    padding:17px 30px;border-radius:14px;border:2px solid var(--ink);cursor:pointer;
+    text-decoration:none;transition:transform .12s ease, background .18s ease, box-shadow .18s ease;
+    background:var(--ink);color:var(--paper);
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+  .btn--orange{background:var(--orange);border-color:var(--orange);color:#fff}
+  .btn--orange:hover{background:var(--orange-deep);border-color:var(--orange-deep)}
+  .btn--ghost{background:transparent;color:var(--ink)}
+  .btn--ghost:hover{background:var(--ink);color:var(--paper)}
+  .btn--lg{font-size:19px;padding:20px 36px}
+  .btn .arw{transition:transform .18s ease}
+  .btn:hover .arw{transform:translateX(4px)}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+
+  /* ---------- Header ---------- */
+  header.site{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
+  .site .row{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .head-cta{font-family:var(--display);font-weight:700;font-size:14px;border:2px solid var(--ink);padding:10px 18px;border-radius:11px;background:transparent;cursor:pointer}
+  .head-cta:hover{background:var(--ink);color:var(--paper)}
+  @media(max-width:560px){.head-cta{display:none}}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none}
+  .screen.active{display:block;animation:fade .4s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;padding:56px 0 40px;overflow:hidden}
+  .hero-grid{max-width:820px;margin:0}
+  .hero h1{font-size:clamp(34px,5.6vw,68px);font-weight:800;max-width:16ch}
+  .hero h1 .u{position:relative;white-space:nowrap}
+  .hero h1 .u::after{content:"";position:absolute;left:-2px;right:-2px;bottom:.06em;height:.16em;background:var(--orange);z-index:-1;border-radius:2px}
+  .hero .lede{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:46ch;margin-top:20px}
+  .hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:28px}
+  .hero-micro{font-size:13.5px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .dot{width:4px;height:4px;border-radius:50%;background:var(--line-ink)}
+  /* hero cabe na 1ª dobra no mobile */
+  @media(max-width:560px){
+    .hero{padding:26px 0 26px}
+    .hero .eyebrow{font-size:11px}
+    .hero h1{font-size:29px;line-height:1.06;max-width:none;margin-top:16px !important}
+    .hero .lede{font-size:15.5px;margin-top:14px}
+    .hero-cta{margin-top:20px;width:100%}
+    .hero-cta .btn{width:100%}
+    .hero-micro{margin-top:14px !important;font-size:12.5px}
+    .btn--lg{font-size:16px;padding:15px 22px}
+  }
+
+  /* ---------- Thesis strip ---------- */
+  /* ---------- Para quem é ---------- */
+  .audience{padding:56px 0}
+  .aud-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+  @media(max-width:860px){.aud-grid{grid-template-columns:1fr;gap:40px}}
+  .aud-lead{color:var(--muted);margin-top:16px;font-size:17px;max-width:46ch}
+  .aud-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+  .aud-tags span{border:1px solid var(--line);border-radius:99px;padding:8px 15px;font-size:13.5px;font-weight:500;color:var(--ink);background:var(--paper)}
+  .aud-card{background:var(--ink);color:#fff;border-radius:22px;padding:34px 32px}
+  .aud-card .lab{font-family:var(--body);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+  .aud-card h3{font-size:24px;color:#fff;margin-top:10px}
+  .aud-check{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:14px}
+  .aud-check li{display:flex;gap:13px;align-items:flex-start;color:#E4E0D9;font-size:15.5px;line-height:1.45}
+  .aud-check svg{flex:none;margin-top:2px}
+  .aud-note{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14);color:#B9B4AC;font-size:14px}
+  .aud-note b{color:#fff;font-weight:600}
+
+  /* ---------- Thesis + pirâmide ---------- */
+  .thesis{background:var(--bone);color:var(--ink);padding:56px 0;border-top:1px solid var(--line)}
+  .thesis-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  @media(max-width:860px){.thesis-grid{grid-template-columns:1fr;gap:44px}}
+  .thesis .q{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.6vw,42px);line-height:1.1;letter-spacing:-.02em;margin-top:16px}
+  .thesis .q .accent{color:var(--orange)}
+  .thesis .sub{color:var(--muted);margin-top:20px;max-width:46ch;font-size:16.5px}
+  .pyramid{width:100%;max-width:440px;margin-inline:auto;display:block}
+  .pyramid .tier{transform-origin:center;opacity:0;animation:pyr .6s cubic-bezier(.2,.9,.3,1.2) forwards}
+  .pyramid .t1{animation-delay:.05s}.pyramid .t2{animation-delay:.2s}.pyramid .t3{animation-delay:.35s}
+  @keyframes pyr{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .pyramid text{font-family:var(--display);font-weight:700}
+  .pyramid .tlab{font-size:15px;letter-spacing:-.01em}
+  .pyramid .tdesc{font-family:var(--body);font-weight:500;font-size:9.4px;letter-spacing:.02em}
+  .pyramid .side{font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+
+  /* ---------- Discover / pain ---------- */
+  .section{padding:56px 0}
+  .section.bone{background:var(--bone)}
+  .sec-head{max-width:640px;margin-bottom:32px}
+  .sec-head h2{font-size:clamp(28px,4vw,44px);margin-top:16px}
+  .sec-head p{color:var(--muted);margin-top:16px;font-size:17px}
+  .discover{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media(max-width:720px){.discover{grid-template-columns:1fr}}
+  .disc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px 24px;display:flex;gap:16px;align-items:flex-start}
+  .disc .n{font-family:var(--display);font-weight:800;font-size:15px;color:var(--orange);border:2px solid var(--orange);width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+  .disc h3{font-size:19px;margin-bottom:6px}
+  .disc p{color:var(--muted);font-size:14.5px}
+
+  /* ---------- Categories ---------- */
+  .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:900px){.cats{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.cats{grid-template-columns:1fr}}
+  .cat{border:1px solid var(--line);border-radius:16px;padding:22px 20px;background:var(--paper);transition:border-color .2s, transform .2s}
+  .cat:hover{border-color:var(--ink);transform:translateY(-3px)}
+  .cat .ic{width:30px;height:30px;margin-bottom:14px}
+  .cat h4{font-size:16px;letter-spacing:-.01em}
+  .cat p{color:var(--muted);font-size:13px;margin-top:6px}
+  .cat.wide{grid-column:span 1}
+
+  /* ---------- Final CTA band ---------- */
+  .band{background:var(--orange);color:#fff;border-radius:26px;padding:56px 48px;text-align:center;position:relative;overflow:hidden}
+  .band h2{font-size:clamp(28px,4vw,46px);color:#fff}
+  .band p{color:rgba(255,255,255,.92);max-width:46ch;margin:18px auto 0;font-size:17px}
+  .band .btn{margin-top:30px;background:#fff;color:var(--ink);border-color:#fff}
+  .band .btn:hover{background:var(--ink);color:#fff}
+  .band .ghostmark{position:absolute;right:-40px;bottom:-40px;width:220px;height:220px;opacity:.16}
+
+  /* ---------- Footer ---------- */
+  footer{padding:48px 0;border-top:1px solid var(--line);background:var(--paper)}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot small{color:var(--muted);font-size:13px}
+
+  /* ---------- Modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(10,10,10,.55);backdrop-filter:blur(3px);z-index:80;display:none;align-items:center;justify-content:center;padding:22px}
+  .overlay.open{display:flex;animation:fade .25s ease}
+  .modal{background:var(--paper);border-radius:22px;max-width:460px;width:100%;padding:34px 32px 30px;box-shadow:var(--shadow);position:relative;animation:rise .32s cubic-bezier(.2,.9,.3,1.1)}
+  @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+  .modal .close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:18px;line-height:1;color:var(--muted)}
+  .modal .close:hover{background:var(--bone)}
+  .modal .badge{width:44px;height:44px;margin-bottom:16px}
+  .modal h3{font-size:24px}
+  .modal .mp{color:var(--muted);margin-top:8px;font-size:14.5px}
+  .field{margin-top:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .field input{width:100%;padding:14px 15px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;font-family:var(--body);transition:border-color .15s, box-shadow .15s;background:var(--paper)}
+  .field input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(10,10,10,.08)}
+  .field input.err{border-color:var(--orange)}
+  .field .msg{color:var(--orange-deep);font-size:12.5px;margin-top:5px;display:none}
+  .field .msg.show{display:block}
+  .modal .btn{width:100%;margin-top:22px}
+  .modal .priv{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;display:flex;gap:6px;align-items:center;justify-content:center}
+
+  /* ---------- QUIZ ---------- */
+  .quiz-shell{min-height:calc(100vh - 76px);display:flex;flex-direction:column;background:var(--bone)}
+  .quiz-top{position:sticky;top:76px;z-index:20;background:var(--bone);padding:22px 0 14px}
+  .prog-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+  .prog-lab{font-family:var(--display);font-weight:700;font-size:14px}
+  .prog-lab .accent{color:var(--orange)}
+  .prog-cat{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .progress{height:8px;background:var(--bone-2);border-radius:99px;overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:var(--orange);border-radius:99px;transition:width .4s cubic-bezier(.3,.9,.3,1)}
+  .quiz-body{flex:1;display:flex;align-items:center;padding:34px 0 60px}
+  .qcard{max-width:760px;margin:0 auto;width:100%;animation:qin .35s ease both}
+  @keyframes qin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .qcard .catlab{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:700}
+  .qcard h2{font-size:clamp(24px,3.6vw,34px);margin-top:12px;letter-spacing:-.02em}
+  .opts{margin-top:28px;display:flex;flex-direction:column;gap:12px}
+  .opt{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:15px;padding:18px 20px;cursor:pointer;font-size:16px;color:var(--ink);transition:border-color .15s, transform .12s, background .15s}
+  .opt:hover{border-color:var(--ink);transform:translateX(3px)}
+  .opt .tick{width:24px;height:24px;border-radius:50%;border:2px solid var(--line-ink);flex:none;display:grid;place-items:center;transition:.15s}
+  .opt .tick::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--orange);transform:scale(0);transition:transform .15s}
+  .opt.sel{border-color:var(--orange);background:var(--orange-tint)}
+  .opt.sel .tick{border-color:var(--orange)}
+  .opt.sel .tick::after{transform:scale(1)}
+  .qnav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:14px}
+  .qback{background:transparent;border:none;color:var(--muted);font-weight:600;font-size:15px;cursor:pointer;padding:8px 4px;display:inline-flex;align-items:center;gap:8px}
+  .qback:hover{color:var(--ink)}
+  .qback[disabled]{opacity:0;pointer-events:none}
+
+  /* ---------- RESULT ---------- */
+  .result-hero{background:var(--ink);color:var(--paper);padding:64px 0 72px}
+  .result-hero .greet{color:#B9B4AC;font-size:15px;margin-bottom:8px}
+  .rgrid{display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:center}
+  @media(max-width:860px){.rgrid{grid-template-columns:1fr;gap:36px}}
+  .rlevel{font-family:var(--body);font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+  .rtitle{font-size:clamp(30px,4.6vw,50px);margin-top:14px;color:#fff}
+  .rscore{display:flex;align-items:baseline;gap:12px;margin-top:22px}
+  .rscore b{font-family:var(--display);font-weight:800;font-size:56px;color:#fff;line-height:1}
+  .rscore span{color:#B9B4AC;font-size:15px}
+  .rdiag{color:#D9D5CE;margin-top:22px;font-size:16.5px;max-width:52ch}
+
+  /* heatmap signature */
+  .heat{aspect-ratio:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:10px}
+  .heat .hc{border-radius:12px;background:#1c1c1c;position:relative;transform:scale(.6);opacity:0;animation:hpop .5s cubic-bezier(.2,.9,.3,1.3) forwards}
+  @keyframes hpop{to{transform:scale(1);opacity:1}}
+  .heat .hc.s0{background:transparent;border:2px solid rgba(255,255,255,.14)}
+  .heat .hc.s1{background:rgba(255,83,16,.28)}
+  .heat .hc.s2{background:rgba(255,83,16,.62)}
+  .heat .hc.s3{background:var(--orange)}
+  .heat-cap{display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  .heat-cap span{font-size:12px;color:#B9B4AC;display:inline-flex;align-items:center;gap:7px}
+  .heat-cap i{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+  .rmessage{background:var(--orange-tint);border:1px solid #FFD9C6;border-radius:18px;padding:26px 26px;margin-top:44px}
+  .rmessage b{font-family:var(--display);display:block;font-size:15px;margin-bottom:8px}
+  .rmessage p{font-size:16px;color:#5a3524}
+
+  .leaks{margin-top:44px}
+  .leaks h3{font-size:22px}
+  .leaks .lead{color:var(--muted);margin-top:8px;max-width:56ch}
+  .leak-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+  @media(max-width:820px){.leak-list{grid-template-columns:1fr}}
+  .leak-item{border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:14px;padding:18px 20px;background:var(--paper)}
+  .leak-item .cn{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-weight:700}
+  .leak-item h4{font-size:16px;margin-top:8px}
+  .leak-item p{font-size:13px;color:var(--muted);margin-top:6px}
+
+  /* session cta */
+  .session{background:var(--ink);color:#fff;border-radius:26px;padding:52px 44px;margin-top:56px;position:relative;overflow:hidden}
+  .session .eyebrow{color:#fff}
+  .session .eyebrow::before{background:var(--orange)}
+  .session h2{font-size:clamp(26px,3.6vw,40px);color:#fff;margin-top:18px;max-width:20ch}
+  .session ul{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:12px}
+  .session li{display:flex;gap:12px;align-items:flex-start;color:#D9D5CE;font-size:16px}
+  .session li svg{flex:none;margin-top:3px}
+  .session .meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px}
+  .session .meta div{font-size:13px;color:#B9B4AC}
+  .session .meta b{display:block;color:#fff;font-family:var(--display);font-size:15px;margin-top:2px}
+  .session .btn{margin-top:30px}
+  .session .ghostmark{position:absolute;right:-30px;top:-30px;width:180px;height:180px;opacity:.1}
+  .session-inner{position:relative;z-index:2;max-width:640px}
+  .restart{text-align:center;margin-top:34px}
+  .restart button{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .restart button:hover{color:var(--ink)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important;transition-duration:.001s !important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site">
+  <div class="wrap row">
+    <a class="brand" href="#" onclick="goHome();return false;" aria-label="BASE — início">
+      <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="27" cy="27" r="19"/>
+        <rect x="54" y="6" width="42" height="42" rx="13"/>
+        <rect x="6" y="54" width="42" height="42" rx="13"/>
+        <rect x="54" y="54" width="42" height="42" rx="13"/>
+      </svg>
+      <span>
+        <span class="brand-word">BASE</span>
+        <span class="brand-tag">profissionalize sua empresa</span>
+      </span>
+    </a>
+    <button class="head-cta" onclick="openLead()">Fazer o diagnóstico</button>
+  </div>
+</header>
+
+<!-- ============ SCREEN: LANDING ============ -->
+<div id="screen-landing" class="screen active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Diagnóstico de eficiência operacional</span>
+        <h1 style="margin-top:22px">Descubra o que está <span class="u">desorganizado</span> na sua empresa — e quanto isso custa.</h1>
+        <p class="lede">16 perguntas rápidas. Um diagnóstico na hora dos problemas que comem seu lucro e travam o crescimento do seu negócio.</p>
+        <div class="hero-cta">
+          <button class="btn btn--orange btn--lg" onclick="openLead()">
+            Fazer o diagnóstico grátis
+            <span class="arw">→</span>
+          </button>
+        </div>
+        <div class="hero-micro" style="margin-top:20px">
+          <span>4 minutos</span><i class="dot"></i>
+          <span>Resultado na hora</span><i class="dot"></i>
+          <span>Sem compromisso</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARA QUEM É (2ª dobra) -->
+  <section class="audience">
+    <div class="wrap aud-grid">
+      <div>
+        <span class="eyebrow">Para quem é</span>
+        <h2 class="sec-head" style="margin-bottom:0"><span style="font-size:clamp(28px,4vw,44px)">Feito pra quem toca a empresa todo dia.</span></h2>
+        <p class="aud-lead">É pra donos e donas de <strong>pequenas empresas de serviço</strong> que seguram tudo nas costas e querem trocar o improviso por mais controle.</p>
+        <div class="aud-tags">
+          <span>Agências</span><span>Clínicas e consultórios</span><span>Escritórios</span>
+          <span>Estúdios</span><span>Consultorias</span><span>Prestadores de serviço</span>
+        </div>
+      </div>
+
+      <div class="aud-card">
+        <div class="lab">É pra você se…</div>
+        <h3>Você se reconhece em pelo menos um destes:</h3>
+        <ul class="aud-check">
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Você trabalha muito, mas no fim do mês sobra pouco.</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Seu dia é resolver problema atrás de problema e nunca sobra tempo pra pensar no futuro da empresa.</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Sua equipe vive sobrecarregada, refazendo tarefa e repetindo os mesmos erros.</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Você não sabe ao certo seus números: quanto custa, quanto sobra, quanto vale cada cliente.</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Você quer crescer, mas sente que a empresa não aguenta ficar maior do jeito que funciona hoje.</li>
+        </ul>
+        <p class="aud-note"><b>Não é sobre trabalhar mais.</b> É sobre organizar a empresa pra ela funcionar sem depender só de você.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESE + PIRÂMIDE -->
+  <section class="thesis">
+    <div class="wrap thesis-grid">
+      <div>
+        <span class="eyebrow">A tese da Base</span>
+        <p class="q">O <span class="accent">caixa</span> mostra como anda a empresa. E como a empresa anda depende de como ela é <span class="accent">organizada</span>.</p>
+        <p class="sub">Quando o lucro não aparece, o problema quase nunca está lá em cima — está na base. É a gestão que segura tudo o que vem acima. Este diagnóstico mostra em qual andar o seu dinheiro está escapando.</p>
+      </div>
+
+      <div>
+        <svg class="pyramid" viewBox="0 0 400 320" role="img" aria-label="Pirâmide: a gestão é a base que sustenta a operação, que sustenta o caixa">
+          <!-- Topo: Caixa -->
+          <g class="tier t1">
+            <path d="M200 16 L256 116 L144 116 Z" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+            <text class="tlab" x="200" y="92" text-anchor="middle" fill="var(--ink)">CAIXA</text>
+            <text class="tdesc" x="200" y="107" text-anchor="middle" fill="var(--muted)">o lucro que sobra</text>
+          </g>
+          <!-- Meio: Operação -->
+          <g class="tier t2">
+            <path d="M139 124 L261 124 L310 212 L90 212 Z" fill="var(--ink)"/>
+            <text class="tlab" x="200" y="164" text-anchor="middle" fill="#fff">OPERAÇÃO</text>
+            <text class="tdesc" x="200" y="180" text-anchor="middle" fill="#B9B4AC">processos, pessoas e entregas</text>
+          </g>
+          <!-- Base: Gestão -->
+          <g class="tier t3">
+            <path d="M85 220 L315 220 L360 300 L40 300 Z" fill="var(--orange)"/>
+            <text class="tlab" x="200" y="256" text-anchor="middle" fill="#fff">GESTÃO, A BASE</text>
+            <text class="tdesc" x="200" y="272" text-anchor="middle" fill="#FFE2D3">decisões, números e estrutura</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCOVER -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">O que você vai descobrir</span>
+        <h2>O que está travando o seu lucro.</h2>
+        <p>Em poucos minutos, você sai do achismo e passa a ver sua empresa com números.</p>
+      </div>
+      <div class="discover">
+        <div class="disc"><div class="n">01</div><div><h3>Como está a saúde da sua empresa</h3><p>Uma nota clara pra sua empresa, do “muito bagunçado” ao “organizado e pronto pra crescer”.</p></div></div>
+        <div class="disc"><div class="n">02</div><div><h3>Por onde seu dinheiro está escapando</h3><p>As partes da empresa que mais consomem seu tempo, seu dinheiro e a energia da equipe hoje.</p></div></div>
+        <div class="disc"><div class="n">03</div><div><h3>O mapa da sua empresa</h3><p>Uma visão área por área, do financeiro ao marketing: o que já funciona e o que precisa de organização.</p></div></div>
+        <div class="disc"><div class="n">04</div><div><h3>O próximo passo concreto</h3><p>Um caminho claro pra seu esforço virar lucro todo mês.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section bone">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">7 áreas avaliadas</span>
+        <h2>Um retrato completo da sua empresa.</h2>
+      </div>
+      <div class="cats" id="catGrid"><!-- injected --></div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="band">
+        <svg class="ghostmark" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="27" cy="27" r="19" fill="none" stroke="#fff" stroke-width="7"/>
+          <rect x="54" y="6" width="42" height="42" rx="13" fill="#fff"/>
+          <rect x="6" y="54" width="42" height="42" rx="13" fill="#fff"/>
+          <rect x="54" y="54" width="42" height="42" rx="13" fill="#fff"/>
+        </svg>
+        <h2>Pronto pra organizar a empresa e fazer o lucro aparecer?</h2>
+        <p>Leva 4 minutos. No fim, você recebe seu diagnóstico completo e o próximo passo pra seguir.</p>
+        <button class="btn btn--lg" onclick="openLead()">Começar meu diagnóstico <span class="arw">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot">
+      <a class="brand" href="#" onclick="goHome();return false;">
+        <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="27" cy="27" r="19"/>
+          <rect x="54" y="6" width="42" height="42" rx="13"/>
+          <rect x="6" y="54" width="42" height="42" rx="13"/>
+          <rect x="54" y="54" width="42" height="42" rx="13"/>
+        </svg>
+        <span class="brand-word">BASE</span>
+      </a>
+      <small>© <span id="yr"></span> BASE · Profissionalize sua empresa</small>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ SCREEN: QUIZ ============ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-top">
+      <div class="wrap">
+        <div class="prog-row">
+          <span class="prog-lab">Pergunta <span class="accent" id="qNum">1</span> de 16</span>
+          <span class="prog-cat" id="qCat">—</span>
+        </div>
+        <div class="progress"><i id="progBar"></i></div>
+      </div>
+    </div>
+    <div class="quiz-body">
+      <div class="wrap" style="width:100%">
+        <div class="qcard" id="qCard"><!-- injected --></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SCREEN: RESULT ============ -->
+<div id="screen-result" class="screen">
+  <section class="result-hero">
+    <div class="wrap">
+      <p class="greet" id="rGreet">Aqui está o seu diagnóstico</p>
+      <div class="rgrid">
+        <div>
+          <p class="rlevel" id="rLevel">—</p>
+          <h1 class="rtitle" id="rTitle">—</h1>
+          <div class="rscore"><b id="rScore">0</b><span>de 48 pontos de eficiência</span></div>
+          <p class="rdiag" id="rDiag">—</p>
+        </div>
+        <div>
+          <div class="heat" id="heat" aria-label="Mapa da sua operação"></div>
+          <div class="heat-cap">
+            <span><i style="background:transparent;border:2px solid rgba(255,255,255,.3)"></i>Ralo</span>
+            <span><i style="background:rgba(255,83,16,.4)"></i>Atenção</span>
+            <span><i style="background:var(--orange)"></i>Forte</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap" style="max-width:920px">
+      <div class="rmessage">
+        <b>O próximo movimento</b>
+        <p id="rMsg">—</p>
+      </div>
+
+      <div class="leaks">
+        <h3>Seus maiores ralos financeiros</h3>
+        <p class="lead">As áreas com menor pontuação são onde a Base costuma gerar folga financeira mais rápido.</p>
+        <div class="leak-list" id="leakList"></div>
+      </div>
+
+      <div class="session">
+        <svg class="ghostmark" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="27" cy="27" r="19" fill="none" stroke="#fff" stroke-width="7"/>
+          <rect x="54" y="6" width="42" height="42" rx="13" fill="#fff"/>
+          <rect x="6" y="54" width="42" height="42" rx="13" fill="#fff"/>
+          <rect x="54" y="54" width="42" height="42" rx="13" fill="#fff"/>
+        </svg>
+        <div class="session-inner">
+          <span class="eyebrow">Sessão estratégica gratuita</span>
+          <h2>Vamos transformar esse diagnóstico em um plano de ação.</h2>
+          <ul>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Aprofundamos o diagnóstico da sua empresa</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Identificamos os 3 ralos que mais custam caro hoje</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Você sai com um plano de ação inicial para gerar folga no caixa</li>
+          </ul>
+          <div class="meta">
+            <div>Duração<b>30 minutos</b></div>
+            <div>Formato<b>Online (Meet/Zoom)</b></div>
+            <div>Investimento<b>Gratuito, sem compromisso</b></div>
+          </div>
+          <a class="btn btn--orange btn--lg" id="sessionBtn" href="#" target="_blank" rel="noopener">Agendar minha sessão gratuita <span class="arw">→</span></a>
+        </div>
+      </div>
+
+      <div class="restart">
+        <button onclick="restart()">Refazer o diagnóstico</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ MODAL: LEAD CAPTURE ============ -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="close" aria-label="Fechar" onclick="closeLead()">✕</button>
+    <svg class="badge" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="27" cy="27" r="19" fill="#fff" stroke="var(--ink)" stroke-width="7"/>
+      <rect x="54" y="6" width="42" height="42" rx="13" fill="var(--ink)"/>
+      <rect x="6" y="54" width="42" height="42" rx="13" fill="var(--orange)"/>
+      <rect x="54" y="54" width="42" height="42" rx="13" fill="var(--ink)"/>
+    </svg>
+    <h3 id="mTitle">Falta pouco para o seu diagnóstico</h3>
+    <p class="mp">Preencha para começar e receber seu resultado personalizado na hora.</p>
+
+    <div class="field">
+      <label for="fNome">Nome</label>
+      <input id="fNome" type="text" autocomplete="name" placeholder="Seu nome" />
+      <div class="msg" id="eNome">Informe seu nome.</div>
+    </div>
+    <div class="field">
+      <label for="fEmail">E-mail</label>
+      <input id="fEmail" type="email" autocomplete="email" placeholder="voce@empresa.com.br" />
+      <div class="msg" id="eEmail">Informe um e-mail válido.</div>
+    </div>
+    <div class="field">
+      <label for="fTel">WhatsApp</label>
+      <input id="fTel" type="tel" autocomplete="tel" inputmode="tel" placeholder="(11) 99999-9999" />
+      <div class="msg" id="eTel">Informe um telefone válido.</div>
+    </div>
+
+    <button class="btn btn--orange" onclick="submitLead()">Começar diagnóstico <span class="arw">→</span></button>
+    <p class="priv">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V5l7-3z" stroke="var(--muted)" stroke-width="1.6"/></svg>
+      Seus dados estão seguros. Sem spam.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  // Mesma integração Supabase usada no cap_popup_padrao (index.html da landing).
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  // TODO: substitua pelos valores do seu projeto Supabase
+  // (Studio -> Settings -> API -> Project URL / anon public key).
+  const SUPABASE_URL = "REPLACE_ME_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "REPLACE_ME_SUPABASE_ANON_KEY";
+
+  window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+<script>
+/* ============================================================
+   CONFIG — ajuste estes valores antes de publicar
+   ============================================================ */
+const CONFIG = {
+  // Link da sua agenda (Calendly, Cal.com, Google Agenda etc).
+  // Se deixar vazio, o botão usa o WhatsApp abaixo.
+  agendamentoUrl: "",
+  // WhatsApp para agendamento (só números, com DDI). Ex.: 5511999999999
+  whatsapp: "5511999999999"
+};
+
+/* ============================================================
+   DADOS DO DIAGNÓSTICO (16 perguntas, 7 categorias)
+   pontos: 0 = dor aguda ... 3 = eficiência
+   ============================================================ */
+const CATS = [
+  { key:"fin", nome:"Gestão Financeira e Precificação", short:"Financeiro & Precificação",
+    desc:"controle sobre o caixa, os custos e quanto sobra.",
+    ralo:"Sem controle de caixa e custo real, você precifica no escuro e a margem some sem você perceber." },
+  { key:"proc", nome:"Processos e Padronização", short:"Processos & Padronização",
+    desc:"entregar sempre no mesmo padrão e parar de refazer.",
+    ralo:"Sem processo documentado, cada um faz do seu jeito, o retrabalho vira rotina e o custo dispara." },
+  { key:"proj", nome:"Gestão de Projetos e Execução", short:"Projetos & Execução",
+    desc:"entregas no prazo e dentro do orçamento.",
+    ralo:"Atrasos e estouros de orçamento corroem a margem e a confiança do cliente a cada entrega." },
+  { key:"time", nome:"Produtividade e Gestão de Equipes", short:"Produtividade & Equipes",
+    desc:"delegar bem, com metas claras e equipe rendendo.",
+    ralo:"Sem delegação e metas claras, tudo depende de você — e isso limita o tamanho da empresa." },
+  { key:"dec", nome:"Tomada de Decisão e Indicadores", short:"Decisão & Indicadores",
+    desc:"decidir com números, não no achismo.",
+    ralo:"Decisão na intuição custa caro: sem indicadores, você não enxerga os gargalos que travam o crescimento." },
+  { key:"tec", nome:"Tecnologia e Automação (IA)", short:"Tecnologia & IA",
+    desc:"usar ferramentas e automação a seu favor.",
+    ralo:"Tarefas manuais e sistemas desconectados consomem horas que poderiam virar lucro." },
+  { key:"mkt", nome:"Marketing e Aquisição de Clientes", short:"Marketing & Aquisição",
+    desc:"atrair e fechar cliente com método, não na sorte.",
+    ralo:"Sem CAC, LTV e processo de marketing, você gasta para atrair cliente sem saber o retorno." },
+];
+
+const QUESTIONS = [
+  // FINANCEIRO (3)
+  { cat:"fin", q:"Como você controla o fluxo de caixa da sua empresa?", opts:[
+    ["Não controlo, ou faço de forma manual e esporádica.",0],
+    ["Controlo em planilhas, sem regularidade ou análise.",1],
+    ["Uso um software, mas não analiso os dados para decidir.",2],
+    ["Tenho controle rigoroso, com projeções para decisões estratégicas.",3]]},
+  { cat:"fin", q:"Você sabe o custo real de cada serviço que oferece?", opts:[
+    ["Não faço ideia; preço no achismo ou pela concorrência.",0],
+    ["Tenho uma estimativa, mas não inclui todos os custos.",1],
+    ["Calculo a maioria dos custos, mas precificar ainda é um desafio.",2],
+    ["Tenho o custo detalhado e uma precificação clara e lucrativa.",3]]},
+  { cat:"fin", q:"Você separa suas finanças pessoais das da empresa?", opts:[
+    ["Não, misturo tudo.",0],
+    ["Tento separar, mas acabo usando o caixa da empresa no pessoal.",1],
+    ["Tenho contas separadas, mas a disciplina ainda falha.",2],
+    ["Totalmente separadas e bem gerenciadas.",3]]},
+  // PROCESSOS (3)
+  { cat:"proc", q:"Sua empresa tem processos padronizados e documentados?", opts:[
+    ["Não, cada um faz do seu jeito.",0],
+    ["Alguns são informais, mas nada documentado.",1],
+    ["Temos alguns documentados, mas nem todos são seguidos.",2],
+    ["Os processos críticos são documentados, atualizados e seguidos.",3]]},
+  { cat:"proc", q:"Com que frequência a equipe comete erros ou refaz tarefas?", opts:[
+    ["Constantemente, virou rotina.",0],
+    ["Com frequência, gerando atrasos e frustração.",1],
+    ["Ocasionalmente, mas ainda impacta a produtividade.",2],
+    ["Raramente; a operação é fluida e com poucos erros.",3]]},
+  { cat:"proc", q:"A entrada de um novo colaborador é fácil e rápida?", opts:[
+    ["É um caos; leva muito tempo e a produtividade inicial é baixa.",0],
+    ["É demorada e consome muito de outros membros da equipe.",1],
+    ["Temos um processo, mas dá para melhorar.",2],
+    ["Temos onboarding estruturado que integra rápido.",3]]},
+  // PROJETOS (2)
+  { cat:"proj", q:"Suas entregas saem no prazo e no orçamento previstos?", opts:[
+    ["Raramente; sempre há atrasos e estouros.",0],
+    ["Costuma atrasar, mas o orçamento se mantém.",1],
+    ["Na maioria das vezes, com alguns desafios.",2],
+    ["Sim, com alta previsibilidade e consistência.",3]]},
+  { cat:"proj", q:"Você usa ferramenta ou método para gerir projetos/entregas?", opts:[
+    ["Não, tudo é feito de forma informal.",0],
+    ["Uso planilhas básicas, sem metodologia clara.",1],
+    ["Uso uma ferramenta, mas a equipe não adota totalmente.",2],
+    ["Temos ferramentas e metodologia bem estabelecidas.",3]]},
+  // EQUIPES (2)
+  { cat:"time", q:"Você consegue delegar tarefas importantes com confiança?", opts:[
+    ["Não; prefiro fazer tudo para garantir que fique bom.",0],
+    ["É difícil; sinto que preciso supervisionar de perto.",1],
+    ["Delego algumas coisas, mas centralizo muitas decisões.",2],
+    ["Minha equipe é autônoma; delego e foco no estratégico.",3]]},
+  { cat:"time", q:"A equipe tem clareza de responsabilidades e metas?", opts:[
+    ["Não; há confusão e sobreposição de funções.",0],
+    ["As funções são gerais, mas as metas não são claras.",1],
+    ["Responsabilidades claras, mas metas poderiam ser mais específicas.",2],
+    ["Sim; cada um sabe o que fazer e o que precisa entregar.",3]]},
+  // DECISÃO (2)
+  { cat:"dec", q:"Você decide com base em dados e indicadores claros?", opts:[
+    ["Não; decido pela intuição ou pelo que sinto.",0],
+    ["Tenho alguns dados, mas não analiso de forma consistente.",1],
+    ["Analiso alguns indicadores, mas falta visão completa.",2],
+    ["Tenho painéis com indicadores que guiam minhas decisões.",3]]},
+  { cat:"dec", q:"Você sabe quais gargalos travam o crescimento da empresa?", opts:[
+    ["Não; sinto muitos problemas e não sei por onde começar.",0],
+    ["Tenho uma ideia, mas não quantifico o impacto.",1],
+    ["Identifico alguns, mas sem plano claro para resolvê-los.",2],
+    ["Sim; conheço os gargalos e tenho estratégias ativas.",3]]},
+  // TECNOLOGIA (2)
+  { cat:"tec", q:"Sua empresa usa IA para automatizar ou otimizar processos?", opts:[
+    ["Não usamos nenhuma ferramenta de IA.",0],
+    ["Conheço algumas, mas não sei como aplicar no negócio.",1],
+    ["Usamos de forma pontual, sem integração.",2],
+    ["Integramos IA em vários processos para automatizar e gerar insights.",3]]},
+  { cat:"tec", q:"A tecnologia atual facilita ou dificulta a operação?", opts:[
+    ["Dificulta; é um problema constante.",0],
+    ["É neutra; não ajuda nem atrapalha muito.",1],
+    ["Ajuda em algumas áreas, mas poderia ser mais integrada.",2],
+    ["Facilita muito; é um diferencial de eficiência.",3]]},
+  // MARKETING (2)
+  { cat:"mkt", q:"Seu marketing é organizado, com processos e métricas?", opts:[
+    ["Não; faço de forma esporádica e sem planejamento.",0],
+    ["Tenho algumas ações, sem processo ou métrica clara.",1],
+    ["Tenho estratégia, mas execução e medição são desafios.",2],
+    ["Sim; marketing estratégico, com processo e resultados medidos.",3]]},
+  { cat:"mkt", q:"Você conhece o CAC e o LTV da sua empresa?", opts:[
+    ["Não faço ideia.",0],
+    ["Tenho uma estimativa, mas não é precisa.",1],
+    ["Calculo o CAC, mas o LTV ainda é um mistério.",2],
+    ["Sim; conheço os dois e uso para otimizar campanhas e vendas.",3]]},
+];
+
+const LEVELS = [
+  { min:0, max:12, level:"Caos Operacional Crítico", title:"Caos Operacional Crítico",
+    diag:"Sua operação está em caos crítico e o ralo financeiro está aberto, drenando recursos rápido. A falta de gestão e processos impede qualquer crescimento sustentável e coloca a saúde do negócio em risco. Hoje, você trabalha na empresa, não para ela.",
+    msg:"É urgente agir. Sem uma intervenção imediata, a empresa segue perdendo dinheiro e oportunidades. A boa notícia: o potencial de melhoria é enorme. A Base ajuda a fechar esse ralo e construir a fundação sólida que sua empresa precisa." },
+  { min:13, max:24, level:"Operação Desorganizada", title:"Operação Desorganizada com Perdas Significativas",
+    diag:"Sua empresa tem sérios problemas de organização. Há vários ralos abertos gerando retrabalho e desperdício de tempo e dinheiro. Você trabalha muito, mas o lucro não aparece — e a falta de processos e indicadores trava a previsibilidade.",
+    msg:"O potencial existe; as ineficiências é que freiam o crescimento. É hora de organizar a casa e transformar esforço em lucro. A Base tem a metodologia e as ferramentas para estruturar sua operação e gerar folga financeira." },
+  { min:25, max:36, level:"Oportunidades de Otimização", title:"Operação com Oportunidades de Otimização",
+    diag:"Sua empresa já tem alguma organização, mas ainda há gargalos e oportunidades reais de otimizar processos e reduzir custos. Você percebe a importância da gestão — falta um método para elevar a eficiência a outro nível.",
+    msg:"Você está no caminho certo. Com ajustes estratégicos e um sistema operacional robusto, dá para alcançar um novo patamar de eficiência e lucro. A Base é o parceiro ideal para refinar sua operação e fazer cada centavo trabalhar a seu favor." },
+  { min:37, max:48, level:"Operação Eficiente", title:"Operação Eficiente com Potencial de Crescimento Acelerado",
+    diag:"Parabéns: sua empresa já demonstra um bom nível de eficiência. Você tem processos, indicadores e uma gestão que funciona. O desafio agora é escalar esse sucesso e acelerar o crescimento com ainda mais previsibilidade e lucro.",
+    msg:"Sua empresa é exemplo de boa gestão. Para crescer de forma sustentável, a Base oferece estratégias avançadas e implementação de IA para otimizar processos e impulsionar seu marketing, mantendo você sempre à frente da concorrência." },
+];
+
+/* ============================================================
+   ESTADO E NAVEGAÇÃO
+   ============================================================ */
+let lead = { nome:"", email:"", telefone:"" };
+let idx = 0;
+let answers = new Array(QUESTIONS.length).fill(null); // pontos por pergunta
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+renderCatGrid();
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
+}
+function goHome(){ show('screen-landing'); }
+
+/* ---- Category grid on landing ---- */
+function catIcon(){
+  return `<svg class="ic" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="27" cy="27" r="18" fill="none" stroke="var(--ink)" stroke-width="8"/>
+    <rect x="54" y="6" width="42" height="42" rx="13" fill="var(--orange)"/>
+    <rect x="6" y="54" width="42" height="42" rx="13" fill="var(--ink)"/>
+    <rect x="54" y="54" width="42" height="42" rx="13" fill="var(--ink)"/></svg>`;
+}
+function renderCatGrid(){
+  document.getElementById('catGrid').innerHTML = CATS.map(c=>`
+    <div class="cat">${catIcon()}<h4>${c.short}</h4><p>${c.desc}</p></div>`).join('');
+}
+
+/* ============================================================
+   MODAL DE CAPTURA
+   ============================================================ */
+let lastFocus=null;
+function openLead(){
+  lastFocus=document.activeElement;
+  const o=document.getElementById('overlay');
+  o.classList.add('open'); o.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('fNome').focus(),60);
+}
+function closeLead(){
+  const o=document.getElementById('overlay');
+  o.classList.remove('open'); o.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+  if(lastFocus)lastFocus.focus();
+}
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay')closeLead(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('overlay').classList.contains('open'))closeLead(); });
+
+function fieldErr(inputId,msgId,on){
+  document.getElementById(inputId).classList.toggle('err',on);
+  document.getElementById(msgId).classList.toggle('show',on);
+}
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function validPhone(v){ return v.replace(/\D/g,'').length>=10; }
+
+function getUtmParams(){
+  const params=new URLSearchParams(window.location.search);
+  const out={};
+  ['utm_source','utm_campaign','utm_medium','utm_content','utm_term'].forEach(function(key){
+    const value=params.get(key);
+    if(value) out[key]=value;
+  });
+  return out;
+}
+
+async function submitLead(){
+  const nome=document.getElementById('fNome').value.trim();
+  const email=document.getElementById('fEmail').value.trim();
+  const tel=document.getElementById('fTel').value.trim();
+  let ok=true;
+  fieldErr('fNome','eNome', nome.length<2); if(nome.length<2)ok=false;
+  fieldErr('fEmail','eEmail', !validEmail(email)); if(!validEmail(email))ok=false;
+  fieldErr('fTel','eTel', !validPhone(tel)); if(!validPhone(tel))ok=false;
+  if(!ok)return;
+
+  lead={ nome, email, telefone:tel };
+
+  // Envia o lead pro Supabase (tabela "leads", mesma lógica do cap_popup_padrao).
+  const utmParams=getUtmParams();
+  if(window.supabaseClient){
+    try{
+      const { error } = await window.supabaseClient.from('leads').insert([{
+        nome, telefone:tel, email,
+        utm_source: utmParams.utm_source || null,
+        utm_campaign: utmParams.utm_campaign || null,
+        utm_medium: utmParams.utm_medium || null,
+        utm_content: utmParams.utm_content || null,
+        utm_term: utmParams.utm_term || null
+      }]);
+      if(error) console.error('Falha ao enviar lead para o Supabase:',error);
+    }catch(err){ console.error('Falha ao enviar lead para o Supabase:',err); }
+  } else {
+    console.error('Supabase ainda não carregou; lead não foi enviado.');
+  }
+
+  closeLead();
+  idx=0; answers=new Array(QUESTIONS.length).fill(null);
+  show('screen-quiz');
+  renderQuestion();
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+function renderQuestion(){
+  const item=QUESTIONS[idx];
+  const cat=CATS.find(c=>c.key===item.cat);
+  document.getElementById('qNum').textContent=idx+1;
+  document.getElementById('qCat').textContent=cat.short;
+  document.getElementById('progBar').style.width=((idx)/QUESTIONS.length*100)+'%';
+
+  const card=document.getElementById('qCard');
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='';
+  card.innerHTML=`
+    <div class="catlab">${cat.short}</div>
+    <h2>${item.q}</h2>
+    <div class="opts" role="listbox">
+      ${item.opts.map((o,i)=>`
+        <button class="opt${answers[idx]===o[1]?' sel':''}" role="option" data-pts="${o[1]}" onclick="pick(this,${o[1]})">
+          <span class="tick"></span><span>${o[0]}</span>
+        </button>`).join('')}
+    </div>
+    <div class="qnav">
+      <button class="qback" onclick="prevQ()" ${idx===0?'disabled':''}>← Voltar</button>
+    </div>`;
+}
+function pick(el,pts){
+  answers[idx]=pts;
+  const card=document.getElementById('qCard');
+  card.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('progBar').style.width=((idx+1)/QUESTIONS.length*100)+'%';
+  setTimeout(nextQ,260);
+}
+function nextQ(){
+  if(idx<QUESTIONS.length-1){ idx++; renderQuestion(); }
+  else{ finish(); }
+}
+function prevQ(){ if(idx>0){ idx--; renderQuestion(); } }
+
+/* ============================================================
+   RESULTADO
+   ============================================================ */
+function finish(){
+  const total=answers.reduce((a,b)=>a+(b||0),0);
+  const lvl=LEVELS.find(l=>total>=l.min&&total<=l.max)||LEVELS[0];
+
+  document.getElementById('rGreet').textContent = lead.nome
+    ? `Olá, ${lead.nome.split(' ')[0]} — aqui está o seu diagnóstico`
+    : 'Aqui está o seu diagnóstico';
+  document.getElementById('rLevel').textContent=lvl.level;
+  document.getElementById('rTitle').textContent=lvl.title;
+  document.getElementById('rScore').textContent=total;
+  document.getElementById('rDiag').textContent=lvl.diag;
+  document.getElementById('rMsg').textContent=lvl.msg;
+
+  // Heatmap 4x4 — uma célula por pergunta
+  const heat=document.getElementById('heat');
+  heat.innerHTML=answers.map((p,i)=>`<div class="hc s${p} " style="animation-delay:${i*0.045}s"></div>`).join('');
+
+  // Ralos: 3 categorias com menor média
+  const byCat={};
+  CATS.forEach(c=>byCat[c.key]={sum:0,n:0});
+  QUESTIONS.forEach((q,i)=>{ byCat[q.cat].sum+=answers[i]; byCat[q.cat].n++; });
+  const ranked=CATS.map(c=>({...c, avg: byCat[c.key].sum/byCat[c.key].n})).sort((a,b)=>a.avg-b.avg);
+  const worst=ranked.slice(0,3);
+  document.getElementById('leakList').innerHTML=worst.map(c=>`
+    <div class="leak-item">
+      <div class="cn">${c.short}</div>
+      <h4>${c.avg<=1?'Ralo crítico':(c.avg<2?'Atenção':'Ponto de ajuste')}</h4>
+      <p>${c.ralo}</p>
+    </div>`).join('');
+
+  // CTA de agendamento
+  const btn=document.getElementById('sessionBtn');
+  if(CONFIG.agendamentoUrl){ btn.href=CONFIG.agendamentoUrl; }
+  else{
+    const msg=encodeURIComponent(`Olá! Fiz o diagnóstico da Base e meu resultado foi "${lvl.level}" (${total}/48 pontos). Quero agendar minha sessão estratégica gratuita.`);
+    btn.href=`https://wa.me/${CONFIG.whatsapp}?text=${msg}`;
+  }
+
+  show('screen-result');
+}
+
+function restart(){
+  idx=0; answers=new Array(QUESTIONS.length).fill(null);
+  goHome();
+}
+</script>
+</body>
+</html>

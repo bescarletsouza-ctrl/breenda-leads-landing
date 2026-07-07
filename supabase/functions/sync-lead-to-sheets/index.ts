@@ -23,11 +23,13 @@ function base64urlFromString(input: string): string {
 }
 
 async function importPrivateKey(pem: string): Promise<CryptoKey> {
-  const normalized = pem.includes("\\n") ? pem.replace(/\\n/g, "\n") : pem;
+  const normalized = pem.replace(/\\n/g, "\n");
+  // Remove cabeçalhos PEM e qualquer caractere fora do alfabeto base64 (aspas,
+  // espaços, quebras de linha etc. que costumam sobrar de copiar/colar em UIs).
   const pemBody = normalized
-    .replace("-----BEGIN PRIVATE KEY-----", "")
-    .replace("-----END PRIVATE KEY-----", "")
-    .replace(/\s/g, "");
+    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
+    .replace(/-----END PRIVATE KEY-----/g, "")
+    .replace(/[^A-Za-z0-9+/=]/g, "");
   const binary = atob(pemBody);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);

@@ -3,61 +3,72 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Breenda | Fale com a gente</title>
-<meta name="description" content="Deixe seus dados e nossa equipe entra em contato com você." />
+<title>Breenda | cap_popup_padrao</title>
+<meta name="description" content="Popup padrão de captura de leads da Breenda, feito para ser embedado em outras páginas." />
 <style>
-  :root {
-    --bg: #faf7f2;
-    --card-bg: #ffffff;
-    --text: #2b2622;
-    --muted: #6b6058;
-    --accent: #b8895f;
-    --accent-dark: #8f6a49;
-    --border: #e4dcd2;
-    --error: #c0392b;
-    --success: #2e7d32;
-    --radius: 14px;
-    --shadow: 0 10px 30px rgba(43, 38, 34, 0.08);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
+  /*
+    cap_popup_padrao
+    Componente de popup de captura de leads. Todo o CSS abaixo usa o
+    prefixo "cpp-" para evitar colisão de nomes ao ser embedado em
+    páginas que já têm seus próprios estilos.
+  */
+  .cpp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 12, 0.55);
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 24px;
+    z-index: 9999;
     font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
   }
 
-  .card {
+  .cpp-overlay.cpp-open { display: flex; }
+
+  .cpp-card {
+    position: relative;
     width: 100%;
     max-width: 460px;
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(20, 16, 12, 0.25);
     padding: 36px 32px;
-    border: 1px solid var(--border);
+    border: 1px solid #e4dcd2;
+    color: #2b2622;
   }
 
-  .card h1 {
-    margin: 0 0 8px;
+  .cpp-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #6b6058;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+
+  .cpp-close:hover { background: #f2ece3; }
+
+  .cpp-card h1 {
+    margin: 0 12px 8px 0;
     font-size: 1.6rem;
     line-height: 1.25;
   }
 
-  .card p.subtitle {
+  .cpp-card p.cpp-subtitle {
     margin: 0 0 28px;
-    color: var(--muted);
+    color: #6b6058;
     font-size: 0.98rem;
     line-height: 1.5;
   }
 
-  label {
+  .cpp-card label {
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
@@ -65,32 +76,32 @@
     margin-top: 18px;
   }
 
-  label:first-of-type { margin-top: 0; }
+  .cpp-card label:first-of-type { margin-top: 0; }
 
-  input[type="text"],
-  input[type="tel"],
-  input[type="email"] {
+  .cpp-card input[type="text"],
+  .cpp-card input[type="tel"],
+  .cpp-card input[type="email"] {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid var(--border);
+    border: 1px solid #e4dcd2;
     border-radius: 10px;
     font-size: 1rem;
-    color: var(--text);
+    color: #2b2622;
     background: #fff;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
 
-  input:focus {
+  .cpp-card input:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: #b8895f;
     box-shadow: 0 0 0 3px rgba(184, 137, 95, 0.15);
   }
 
-  button[type="submit"] {
+  .cpp-card button[type="submit"] {
     width: 100%;
     margin-top: 26px;
     padding: 14px 16px;
-    background: var(--accent);
+    background: #b8895f;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -100,14 +111,14 @@
     transition: background 0.15s ease, opacity 0.15s ease;
   }
 
-  button[type="submit"]:hover:not(:disabled) { background: var(--accent-dark); }
+  .cpp-card button[type="submit"]:hover:not(:disabled) { background: #8f6a49; }
 
-  button[type="submit"]:disabled {
+  .cpp-card button[type="submit"]:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  .message {
+  .cpp-message {
     display: none;
     margin-top: 18px;
     padding: 12px 14px;
@@ -116,69 +127,106 @@
     line-height: 1.4;
   }
 
-  .message.show { display: block; }
+  .cpp-message.cpp-show { display: block; }
 
-  .message.error {
+  .cpp-message.cpp-error {
     background: rgba(192, 57, 43, 0.08);
-    color: var(--error);
+    color: #c0392b;
     border: 1px solid rgba(192, 57, 43, 0.25);
   }
 
-  .message.success {
+  .cpp-message.cpp-success {
     background: rgba(46, 125, 50, 0.08);
-    color: var(--success);
+    color: #2e7d32;
     border: 1px solid rgba(46, 125, 50, 0.25);
   }
 
-  .form-wrap.hidden { display: none; }
+  .cpp-form-wrap.cpp-hidden { display: none; }
 
-  .success-panel {
+  .cpp-success-panel {
     display: none;
     text-align: center;
     padding: 12px 0 4px;
   }
 
-  .success-panel.show { display: block; }
+  .cpp-success-panel.cpp-show { display: block; }
 
-  .success-panel h2 {
+  .cpp-success-panel h2 {
     margin: 0 0 8px;
     font-size: 1.3rem;
   }
 
-  .success-panel p {
+  .cpp-success-panel p {
     margin: 0;
-    color: var(--muted);
+    color: #6b6058;
     line-height: 1.5;
   }
+
+  /* Estilos só da página de demonstração (não fazem parte do componente) */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: #faf7f2;
+    color: #2b2622;
+  }
+
+  .demo-trigger {
+    padding: 14px 24px;
+    background: #b8895f;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .demo-trigger:hover { background: #8f6a49; }
 </style>
 </head>
 <body>
-  <main class="card">
-    <div class="form-wrap" id="form-wrap">
-      <h1>Vamos conversar?</h1>
-      <p class="subtitle">Preencha seus dados abaixo e nossa equipe entra em contato em breve.</p>
+  <!-- Página de demonstração: em produção, apenas o bloco #cap-popup-padrao
+       abaixo (overlay + script) é embedado na página de destino, disparado
+       por window.CapPopupPadrao.open() a partir de um botão/link/evento
+       daquela página. -->
+  <button type="button" class="demo-trigger" id="demo-open-btn">Abrir formulário</button>
 
-      <form id="lead-form" novalidate>
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required />
+  <div class="cpp-overlay" id="cap-popup-padrao">
+    <div class="cpp-card">
+      <button type="button" class="cpp-close" id="cpp-close-btn" aria-label="Fechar">&times;</button>
 
-        <label for="telefone">Telefone / WhatsApp</label>
-        <input type="tel" id="telefone" name="telefone" autocomplete="tel" placeholder="(11) 99999-9999" required />
+      <div class="cpp-form-wrap" id="cpp-form-wrap">
+        <h1>Vamos conversar?</h1>
+        <p class="cpp-subtitle">Preencha seus dados abaixo e nossa equipe entra em contato em breve.</p>
 
-        <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" autocomplete="email" placeholder="voce@email.com" required />
+        <form id="cpp-lead-form" novalidate>
+          <label for="cpp-nome">Nome</label>
+          <input type="text" id="cpp-nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required />
 
-        <div id="form-message" class="message"></div>
+          <label for="cpp-telefone">Telefone / WhatsApp</label>
+          <input type="tel" id="cpp-telefone" name="telefone" autocomplete="tel" placeholder="(11) 99999-9999" required />
 
-        <button type="submit" id="submit-btn">Enviar</button>
-      </form>
+          <label for="cpp-email">E-mail</label>
+          <input type="email" id="cpp-email" name="email" autocomplete="email" placeholder="voce@email.com" required />
+
+          <div id="cpp-form-message" class="cpp-message"></div>
+
+          <button type="submit" id="cpp-submit-btn">Enviar</button>
+        </form>
+      </div>
+
+      <div class="cpp-success-panel" id="cpp-success-panel">
+        <h2>Recebemos seus dados!</h2>
+        <p>Obrigado por entrar em contato. Nossa equipe vai falar com você em breve.</p>
+      </div>
     </div>
-
-    <div class="success-panel" id="success-panel">
-      <h2>Recebemos seus dados!</h2>
-      <p>Obrigado por entrar em contato. Nossa equipe vai falar com você em breve.</p>
-    </div>
-  </main>
+  </div>
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -206,32 +254,52 @@
 
     function showMessage(el, text, type) {
       el.textContent = text;
-      el.className = "message show " + type;
+      el.className = "cpp-message cpp-show " + type;
     }
 
     function clearMessage(el) {
       el.textContent = "";
-      el.className = "message";
+      el.className = "cpp-message";
     }
 
-    const form = document.getElementById("lead-form");
-    const formWrap = document.getElementById("form-wrap");
-    const successPanel = document.getElementById("success-panel");
-    const messageEl = document.getElementById("form-message");
-    const submitBtn = document.getElementById("submit-btn");
+    const overlay = document.getElementById("cap-popup-padrao");
+    const closeBtn = document.getElementById("cpp-close-btn");
+    const form = document.getElementById("cpp-lead-form");
+    const formWrap = document.getElementById("cpp-form-wrap");
+    const successPanel = document.getElementById("cpp-success-panel");
+    const messageEl = document.getElementById("cpp-form-message");
+    const submitBtn = document.getElementById("cpp-submit-btn");
 
     const utmParams = getUtmParams();
+
+    function openPopup() {
+      overlay.classList.add("cpp-open");
+    }
+
+    function closePopup() {
+      overlay.classList.remove("cpp-open");
+    }
+
+    // API pública para outras páginas controlarem o popup:
+    //   window.CapPopupPadrao.open()
+    //   window.CapPopupPadrao.close()
+    window.CapPopupPadrao = { open: openPopup, close: closePopup };
+
+    closeBtn.addEventListener("click", closePopup);
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) closePopup();
+    });
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       clearMessage(messageEl);
 
-      const nome = document.getElementById("nome").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const nome = document.getElementById("cpp-nome").value.trim();
+      const telefone = document.getElementById("cpp-telefone").value.trim();
+      const email = document.getElementById("cpp-email").value.trim();
 
       if (!nome || !telefone || !email) {
-        showMessage(messageEl, "Preencha nome, telefone e e-mail para continuar.", "error");
+        showMessage(messageEl, "Preencha nome, telefone e e-mail para continuar.", "cpp-error");
         return;
       }
 
@@ -253,15 +321,18 @@
 
       if (error) {
         console.error("Falha ao enviar lead:", error);
-        showMessage(messageEl, "Não foi possível enviar seus dados agora. Tente novamente em instantes.", "error");
+        showMessage(messageEl, "Não foi possível enviar seus dados agora. Tente novamente em instantes.", "cpp-error");
         submitBtn.disabled = false;
         submitBtn.textContent = "Enviar";
         return;
       }
 
-      formWrap.classList.add("hidden");
-      successPanel.classList.add("show");
+      formWrap.classList.add("cpp-hidden");
+      successPanel.classList.add("cpp-show");
     });
+
+    // Botão da página de demonstração (não faz parte do componente embedável)
+    document.getElementById("demo-open-btn").addEventListener("click", openPopup);
   </script>
 </body>
 </html>

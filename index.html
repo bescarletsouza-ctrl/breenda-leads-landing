@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Breenda | Fale com a gente</title>
+<meta name="description" content="Deixe seus dados e nossa equipe entra em contato com você." />
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card-bg: #ffffff;
+    --text: #2b2622;
+    --muted: #6b6058;
+    --accent: #b8895f;
+    --accent-dark: #8f6a49;
+    --border: #e4dcd2;
+    --error: #c0392b;
+    --success: #2e7d32;
+    --radius: 14px;
+    --shadow: 0 10px 30px rgba(43, 38, 34, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px 32px;
+    border: 1px solid var(--border);
+  }
+
+  .card h1 {
+    margin: 0 0 8px;
+    font-size: 1.6rem;
+    line-height: 1.25;
+  }
+
+  .card p.subtitle {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 18px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(184, 137, 95, 0.15);
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    margin-top: 26px;
+    padding: 14px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+
+  button[type="submit"]:hover:not(:disabled) { background: var(--accent-dark); }
+
+  button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .message {
+    display: none;
+    margin-top: 18px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .message.show { display: block; }
+
+  .message.error {
+    background: rgba(192, 57, 43, 0.08);
+    color: var(--error);
+    border: 1px solid rgba(192, 57, 43, 0.25);
+  }
+
+  .message.success {
+    background: rgba(46, 125, 50, 0.08);
+    color: var(--success);
+    border: 1px solid rgba(46, 125, 50, 0.25);
+  }
+
+  .form-wrap.hidden { display: none; }
+
+  .success-panel {
+    display: none;
+    text-align: center;
+    padding: 12px 0 4px;
+  }
+
+  .success-panel.show { display: block; }
+
+  .success-panel h2 {
+    margin: 0 0 8px;
+    font-size: 1.3rem;
+  }
+
+  .success-panel p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="form-wrap" id="form-wrap">
+      <h1>Vamos conversar?</h1>
+      <p class="subtitle">Preencha seus dados abaixo e nossa equipe entra em contato em breve.</p>
+
+      <form id="lead-form" novalidate>
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Seu nome completo" required />
+
+        <label for="telefone">Telefone / WhatsApp</label>
+        <input type="tel" id="telefone" name="telefone" autocomplete="tel" placeholder="(11) 99999-9999" required />
+
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="voce@email.com" required />
+
+        <div id="form-message" class="message"></div>
+
+        <button type="submit" id="submit-btn">Enviar</button>
+      </form>
+    </div>
+
+    <div class="success-panel" id="success-panel">
+      <h2>Recebemos seus dados!</h2>
+      <p>Obrigado por entrar em contato. Nossa equipe vai falar com você em breve.</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // TODO: substitua pelos valores do seu projeto Supabase
+    // (Studio -> Settings -> API -> Project URL / anon public key).
+    // Esses valores são feitos para serem públicos no client-side; a
+    // segurança real vem das políticas de RLS configuradas na tabela "leads".
+    const SUPABASE_URL = "REPLACE_ME_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "REPLACE_ME_SUPABASE_ANON_KEY";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const UTM_KEYS = ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term"];
+
+    function getUtmParams() {
+      const params = new URLSearchParams(window.location.search);
+      const out = {};
+      UTM_KEYS.forEach(function (key) {
+        const value = params.get(key);
+        if (value) out[key] = value;
+      });
+      return out;
+    }
+
+    function showMessage(el, text, type) {
+      el.textContent = text;
+      el.className = "message show " + type;
+    }
+
+    function clearMessage(el) {
+      el.textContent = "";
+      el.className = "message";
+    }
+
+    const form = document.getElementById("lead-form");
+    const formWrap = document.getElementById("form-wrap");
+    const successPanel = document.getElementById("success-panel");
+    const messageEl = document.getElementById("form-message");
+    const submitBtn = document.getElementById("submit-btn");
+
+    const utmParams = getUtmParams();
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearMessage(messageEl);
+
+      const nome = document.getElementById("nome").value.trim();
+      const telefone = document.getElementById("telefone").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!nome || !telefone || !email) {
+        showMessage(messageEl, "Preencha nome, telefone e e-mail para continuar.", "error");
+        return;
+      }
+
+      const payload = {
+        nome: nome,
+        telefone: telefone,
+        email: email,
+        utm_source: utmParams.utm_source || null,
+        utm_campaign: utmParams.utm_campaign || null,
+        utm_medium: utmParams.utm_medium || null,
+        utm_content: utmParams.utm_content || null,
+        utm_term: utmParams.utm_term || null
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Enviando...";
+
+      const { error } = await supabase.from("leads").insert([payload]);
+
+      if (error) {
+        console.error("Falha ao enviar lead:", error);
+        showMessage(messageEl, "Não foi possível enviar seus dados agora. Tente novamente em instantes.", "error");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar";
+        return;
+      }
+
+      formWrap.classList.add("hidden");
+      successPanel.classList.add("show");
+    });
+  </script>
+</body>
+</html>

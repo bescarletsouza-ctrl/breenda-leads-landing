@@ -118,7 +118,7 @@
     .hero-micro{margin-top:18px !important;font-size:14px;justify-content:flex-start}
     .btn--lg{font-size:19px;padding:20px 24px}
 
-    /* barra fixa de CTA — só na tela inicial, fica escondida em quiz/resultado */
+    /* barra fixa de CTA — só na tela inicial, aparece a partir da 2ª dobra */
     #screen-landing{padding-bottom:88px}
     .mobile-cta-bar{
       display:block;
@@ -129,7 +129,10 @@
       border-top:1px solid var(--line);
       padding:12px 20px calc(12px + env(safe-area-inset-bottom));
       box-shadow:0 -8px 24px rgba(10,10,10,.1);
+      transform:translateY(120%);
+      transition:transform .25s ease;
     }
+    .mobile-cta-bar.show{transform:translateY(0)}
     .mobile-cta-bar .btn{width:100%;font-size:17px;padding:16px 22px}
   }
 
@@ -776,6 +779,19 @@ let answers = new Array(QUESTIONS.length).fill(null); // pontos por pergunta
 
 document.getElementById('yr').textContent = new Date().getFullYear();
 renderCatGrid();
+
+/* Barra fixa de CTA (mobile): some na 1ª dobra (hero), aparece a partir da 2ª */
+(function(){
+  const heroEl = document.querySelector('.hero');
+  const ctaBar = document.querySelector('.mobile-cta-bar');
+  if(!heroEl || !ctaBar || !('IntersectionObserver' in window)) return;
+  const observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      ctaBar.classList.toggle('show', !entry.isIntersecting);
+    });
+  }, { threshold: 0 });
+  observer.observe(heroEl);
+})();
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));

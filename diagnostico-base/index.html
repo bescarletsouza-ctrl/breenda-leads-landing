@@ -338,13 +338,13 @@
   </div>
 </header>
 
+<!-- CTA fixo (só mobile, só na tela inicial, a partir da 2ª dobra) -->
+<div class="mobile-cta-bar">
+  <button class="btn btn--orange" onclick="openLead()">Fazer o diagnóstico grátis <span class="arw">→</span></button>
+</div>
+
 <!-- ============ SCREEN: LANDING ============ -->
 <div id="screen-landing" class="screen active">
-
-  <!-- CTA fixo (só mobile) -->
-  <div class="mobile-cta-bar">
-    <button class="btn btn--orange" onclick="openLead()">Fazer o diagnóstico grátis <span class="arw">→</span></button>
-  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -781,22 +781,25 @@ let answers = new Array(QUESTIONS.length).fill(null); // pontos por pergunta
 document.getElementById('yr').textContent = new Date().getFullYear();
 renderCatGrid();
 
-/* Barra fixa de CTA (mobile): some na 1ª dobra (hero), aparece a partir da 2ª */
-(function(){
-  const heroEl = document.querySelector('.hero');
+/* Barra fixa de CTA (mobile): some na 1ª dobra (hero) e na tela do quiz/resultado,
+   aparece a partir da 2ª dobra da tela inicial. */
+function updateMobileCta(){
   const ctaBar = document.querySelector('.mobile-cta-bar');
-  if(!heroEl || !ctaBar || !('IntersectionObserver' in window)) return;
-  const observer = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      ctaBar.classList.toggle('show', !entry.isIntersecting);
-    });
-  }, { threshold: 0 });
-  observer.observe(heroEl);
-})();
+  const heroEl = document.querySelector('.hero');
+  const landingEl = document.getElementById('screen-landing');
+  if(!ctaBar || !heroEl || !landingEl) return;
+  const onLanding = landingEl.classList.contains('active');
+  const pastHero = heroEl.getBoundingClientRect().bottom <= 0;
+  ctaBar.classList.toggle('show', onLanding && pastHero);
+}
+window.addEventListener('scroll', updateMobileCta, { passive: true });
+window.addEventListener('resize', updateMobileCta);
+updateMobileCta();
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  updateMobileCta();
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
 function goHome(){ show('screen-landing'); }

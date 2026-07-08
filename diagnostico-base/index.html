@@ -789,8 +789,8 @@ function updateMobileCta(){
   const landingEl = document.getElementById('screen-landing');
   if(!ctaBar || !heroEl || !landingEl) return;
   const onLanding = landingEl.classList.contains('active');
-  const pastHero = heroEl.getBoundingClientRect().bottom <= 0;
-  ctaBar.classList.toggle('show', onLanding && pastHero);
+  const enteringFold2 = heroEl.getBoundingClientRect().bottom <= window.innerHeight * 0.5;
+  ctaBar.classList.toggle('show', onLanding && enteringFold2);
 }
 window.addEventListener('scroll', updateMobileCta, { passive: true });
 window.addEventListener('resize', updateMobileCta);

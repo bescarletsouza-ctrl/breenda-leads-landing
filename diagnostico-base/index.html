@@ -278,7 +278,7 @@
   .heat .hc.s3{background:var(--orange)}
   .hc-label{font-family:var(--body);font-weight:700;font-size:9.5px;letter-spacing:.03em;color:rgba(255,255,255,.45);pointer-events:none;text-align:center}
   .heat .hc.s2 .hc-label,.heat .hc.s3 .hc-label{color:rgba(255,255,255,.9)}
-  .heat .hc.flagged{box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--orange)}
+  .heat .hc.flagged{background:var(--orange);border-color:var(--orange)}
   .heat .hc.flagged .hc-label{color:#fff}
   .heat-cap{display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   .heat-cap span{font-size:12px;color:#B9B4AC;display:inline-flex;align-items:center;gap:7px}
@@ -1007,7 +1007,7 @@ function finish(){
     document.getElementById('leakList').innerHTML=worst.map(c=>`
       <div class="leak-item">
         <div class="cn">${c.code} · ${c.short}</div>
-        <h4>${c.avg<=1?'Ralo crítico':(c.avg<2?'Atenção':'Ponto de ajuste')}</h4>
+        <h4>Ralo crítico</h4>
         <p>${c.ralo}</p>
       </div>`).join('');
   }

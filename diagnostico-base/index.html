@@ -98,6 +98,7 @@
   .hero-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px;margin-top:28px}
   .hero-micro{font-size:13.5px;color:var(--muted);display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
   .dot{width:4px;height:4px;border-radius:50%;background:var(--line-ink)}
+  .mobile-cta-bar{display:none}
   /* hero ocupa a 1ª dobra inteira no mobile; demais seções só aparecem ao rolar */
   @media(max-width:560px){
     .hero{
@@ -109,13 +110,13 @@
       box-sizing:border-box;
     }
     .hero-grid{text-align:left;margin:0;width:100%}
-    .hero .eyebrow{font-size:11px}
-    .hero h1{font-size:29px;line-height:1.06;max-width:none;margin-top:16px !important;margin-inline:0}
-    .hero .lede{font-size:15.5px;margin-top:14px;margin-inline:0}
-    .hero-cta{margin-top:20px;width:100%;justify-content:flex-start}
+    .hero .eyebrow{font-size:13px}
+    .hero h1{font-size:42px;line-height:1.08;max-width:none;margin-top:18px !important;margin-inline:0}
+    .hero .lede{font-size:19px;margin-top:18px;margin-inline:0}
+    .hero-cta{margin-top:28px;width:100%;justify-content:flex-start}
     .hero-cta .btn{width:100%}
-    .hero-micro{margin-top:14px !important;font-size:12.5px;justify-content:flex-start}
-    .btn--lg{font-size:16px;padding:15px 22px}
+    .hero-micro{margin-top:18px !important;font-size:14px;justify-content:flex-start}
+    .btn--lg{font-size:19px;padding:20px 24px}
 
     /* barra fixa de CTA — só na tela inicial, fica escondida em quiz/resultado */
     #screen-landing{padding-bottom:88px}
@@ -129,9 +130,8 @@
       padding:12px 20px calc(12px + env(safe-area-inset-bottom));
       box-shadow:0 -8px 24px rgba(10,10,10,.1);
     }
-    .mobile-cta-bar .btn{width:100%}
+    .mobile-cta-bar .btn{width:100%;font-size:17px;padding:16px 22px}
   }
-  .mobile-cta-bar{display:none}
 
   /* ---------- Thesis strip ---------- */
   /* ---------- Para quem é ---------- */

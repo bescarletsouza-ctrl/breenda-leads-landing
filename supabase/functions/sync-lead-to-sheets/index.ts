@@ -137,12 +137,26 @@ Deno.serve(async (request: Request) => {
   }
 
   // DEBUG temporário — não expõe a chave, só metadados para diagnosticar
-  // se ela está sendo truncada ao ser colada no campo de secret.
+  // se ela está sendo truncada/corrompida ao ser colada no campo de secret.
   console.log("DEBUG private key length:", privateKey.length,
     "has BEGIN:", privateKey.includes("BEGIN"),
     "has END:", privateKey.includes("END"),
     "newline count:", (privateKey.match(/\n/g) || []).length,
     "literal-\\n count:", (privateKey.match(/\\n/g) || []).length);
+
+  const debugBody = privateKey
+    .replace(/\\n/g, "\n")
+    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
+    .replace(/-----END PRIVATE KEY-----/g, "")
+    .replace(/[^A-Za-z0-9+/=]/g, "");
+  console.log("DEBUG pemBody length:", debugBody.length,
+    "mod4:", debugBody.length % 4,
+    "plus count:", (debugBody.match(/\+/g) || []).length,
+    "slash count:", (debugBody.match(/\//g) || []).length,
+    "equals count:", (debugBody.match(/=/g) || []).length,
+    "space count in raw key:", (privateKey.match(/ /g) || []).length,
+    "first10:", debugBody.slice(0, 10),
+    "last10:", debugBody.slice(-10));
 
   const row = [
     record.nome ?? "",

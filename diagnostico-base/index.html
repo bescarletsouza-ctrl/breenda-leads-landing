@@ -270,12 +270,14 @@
 
   /* heatmap signature */
   .heat{aspect-ratio:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:10px}
-  .heat .hc{border-radius:12px;background:#1c1c1c;position:relative;transform:scale(.6);opacity:0;animation:hpop .5s cubic-bezier(.2,.9,.3,1.3) forwards}
+  .heat .hc{border-radius:12px;background:#1c1c1c;position:relative;display:flex;align-items:center;justify-content:center;transform:scale(.6);opacity:0;animation:hpop .5s cubic-bezier(.2,.9,.3,1.3) forwards}
   @keyframes hpop{to{transform:scale(1);opacity:1}}
   .heat .hc.s0{background:transparent;border:2px solid rgba(255,255,255,.14)}
   .heat .hc.s1{background:rgba(255,83,16,.28)}
   .heat .hc.s2{background:rgba(255,83,16,.62)}
   .heat .hc.s3{background:var(--orange)}
+  .hc-label{font-family:var(--body);font-weight:700;font-size:9.5px;letter-spacing:.03em;color:rgba(255,255,255,.45);pointer-events:none;text-align:center}
+  .heat .hc.s2 .hc-label,.heat .hc.s3 .hc-label{color:rgba(255,255,255,.9)}
   .heat-cap{display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   .heat-cap span{font-size:12px;color:#B9B4AC;display:inline-flex;align-items:center;gap:7px}
   .heat-cap i{width:12px;height:12px;border-radius:4px;display:inline-block}
@@ -643,31 +645,31 @@ const CONFIG = {
    pontos: 0 = dor aguda ... 3 = eficiência
    ============================================================ */
 const CATS = [
-  { key:"fin", nome:"Gestão Financeira e Precificação", short:"Financeiro & Precificação",
+  { key:"fin", nome:"Gestão Financeira e Precificação", short:"Financeiro & Precificação", code:"FIN",
     desc:"controle sobre o caixa, os custos e quanto sobra.",
     ralo:"Sem controle de caixa e custo real, você precifica no escuro e a margem some sem você perceber.",
     scaleTip:"Seu controle financeiro atual foi feito pro volume de hoje — confirme se ele aguenta mais operações, mais clientes e mais gente decidindo, sem perder precisão." },
-  { key:"proc", nome:"Processos e Padronização", short:"Processos & Padronização",
+  { key:"proc", nome:"Processos e Padronização", short:"Processos & Padronização", code:"PROC",
     desc:"entregar sempre no mesmo padrão e parar de refazer.",
     ralo:"Sem processo documentado, cada um faz do seu jeito, o retrabalho vira rotina e o custo dispara.",
     scaleTip:"Processos que funcionam com a equipe atual podem travar com o dobro de gente — reveja o que ainda depende só de você antes de crescer." },
-  { key:"proj", nome:"Gestão de Projetos e Execução", short:"Projetos & Execução",
+  { key:"proj", nome:"Gestão de Projetos e Execução", short:"Projetos & Execução", code:"PROJ",
     desc:"entregas no prazo e dentro do orçamento.",
     ralo:"Atrasos e estouros de orçamento corroem a margem e a confiança do cliente a cada entrega.",
     scaleTip:"Sua capacidade de entrega hoje tem um teto — mapeie qual é esse teto antes de aceitar mais volume do que a operação aguenta." },
-  { key:"time", nome:"Produtividade e Gestão de Equipes", short:"Produtividade & Equipes",
+  { key:"time", nome:"Produtividade e Gestão de Equipes", short:"Produtividade & Equipes", code:"EQP",
     desc:"delegar bem, com metas claras e equipe rendendo.",
     ralo:"Sem delegação e metas claras, tudo depende de você — e isso limita o tamanho da empresa.",
     scaleTip:"Escalar normalmente significa contratar e delegar mais — confirme se a estrutura de gestão atual segura um time maior sem perder qualidade." },
-  { key:"dec", nome:"Tomada de Decisão e Indicadores", short:"Decisão & Indicadores",
+  { key:"dec", nome:"Tomada de Decisão e Indicadores", short:"Decisão & Indicadores", code:"DEC",
     desc:"decidir com números, não no achismo.",
     ralo:"Decisão na intuição custa caro: sem indicadores, você não enxerga os gargalos que travam o crescimento.",
     scaleTip:"Os indicadores que bastam hoje podem não avisar a tempo quando algo quebrar em maior escala — vale revisar o que precisa ser acompanhado mais de perto." },
-  { key:"tec", nome:"Tecnologia e Automação (IA)", short:"Tecnologia & IA",
+  { key:"tec", nome:"Tecnologia e Automação (IA)", short:"Tecnologia & IA", code:"TEC",
     desc:"usar ferramentas e automação a seu favor.",
     ralo:"Tarefas manuais e sistemas desconectados consomem horas que poderiam virar lucro.",
     scaleTip:"Tarefas manuais que hoje cabem no seu tempo tendem a virar gargalo com mais volume — identifique o que precisa ser automatizado antes de escalar." },
-  { key:"mkt", nome:"Marketing e Aquisição de Clientes", short:"Marketing & Aquisição",
+  { key:"mkt", nome:"Marketing e Aquisição de Clientes", short:"Marketing & Aquisição", code:"MKT",
     desc:"atrair e fechar cliente com método, não na sorte.",
     ralo:"Sem CAC, LTV e processo de marketing, você gasta para atrair cliente sem saber o retorno.",
     scaleTip:"Aumentar o investimento em aquisição sem confirmar CAC e LTV pode acelerar prejuízo, não lucro — valide esses números antes de pisar no acelerador." },
@@ -968,9 +970,15 @@ function finish(){
   document.getElementById('rDiag').textContent=lvl.diag;
   document.getElementById('rMsg').textContent=lvl.msg;
 
-  // Heatmap 4x4 — uma célula por pergunta
+  // Heatmap 4x4 — uma célula por pergunta, rotulada com a sigla da categoria
   const heat=document.getElementById('heat');
-  heat.innerHTML=answers.map((p,i)=>`<div class="hc s${p} " style="animation-delay:${i*0.045}s"></div>`).join('');
+  heat.innerHTML=answers.map((p,i)=>{
+    const q=QUESTIONS[i];
+    const cat=CATS.find(c=>c.key===q.cat);
+    return `<div class="hc s${p}" style="animation-delay:${i*0.045}s" title="${cat.short}: ${q.q}">
+      <span class="hc-label">${cat.code}</span>
+    </div>`;
+  }).join('');
 
   // 3 categorias com menor média — "ralos" pra maioria, "checagem de escala" pro nível mais alto
   const byCat={};
@@ -984,7 +992,7 @@ function finish(){
     document.getElementById('leaksLead').textContent='Sua operação está pronta pra crescer — essas são as áreas que vale confirmar se aguentam o próximo salto de volume antes de acelerar.';
     document.getElementById('leakList').innerHTML=worst.map(c=>`
       <div class="leak-item">
-        <div class="cn">${c.short}</div>
+        <div class="cn">${c.code} · ${c.short}</div>
         <h4>Checagem de escala</h4>
         <p>${c.scaleTip}</p>
       </div>`).join('');
@@ -993,7 +1001,7 @@ function finish(){
     document.getElementById('leaksLead').textContent='As áreas com menor pontuação são onde a Base costuma gerar folga financeira mais rápido.';
     document.getElementById('leakList').innerHTML=worst.map(c=>`
       <div class="leak-item">
-        <div class="cn">${c.short}</div>
+        <div class="cn">${c.code} · ${c.short}</div>
         <h4>${c.avg<=1?'Ralo crítico':(c.avg<2?'Atenção':'Ponto de ajuste')}</h4>
         <p>${c.ralo}</p>
       </div>`).join('');

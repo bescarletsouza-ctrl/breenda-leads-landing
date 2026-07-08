@@ -278,6 +278,8 @@
   .heat .hc.s3{background:var(--orange)}
   .hc-label{font-family:var(--body);font-weight:700;font-size:9.5px;letter-spacing:.03em;color:rgba(255,255,255,.45);pointer-events:none;text-align:center}
   .heat .hc.s2 .hc-label,.heat .hc.s3 .hc-label{color:rgba(255,255,255,.9)}
+  .heat .hc.flagged{box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--orange)}
+  .heat .hc.flagged .hc-label{color:#fff}
   .heat-cap{display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   .heat-cap span{font-size:12px;color:#B9B4AC;display:inline-flex;align-items:center;gap:7px}
   .heat-cap i{width:12px;height:12px;border-radius:4px;display:inline-block}
@@ -531,6 +533,7 @@
             <span><i style="background:transparent;border:2px solid rgba(255,255,255,.3)"></i>Ralo</span>
             <span><i style="background:rgba(255,83,16,.4)"></i>Atenção</span>
             <span><i style="background:var(--orange)"></i>Forte</span>
+            <span><i style="background:#1c1c1c;box-shadow:0 0 0 2px #fff, 0 0 0 3px var(--orange)"></i>Área citada abaixo</span>
           </div>
         </div>
       </div>
@@ -970,22 +973,25 @@ function finish(){
   document.getElementById('rDiag').textContent=lvl.diag;
   document.getElementById('rMsg').textContent=lvl.msg;
 
-  // Heatmap 4x4 — uma célula por pergunta, rotulada com a sigla da categoria
-  const heat=document.getElementById('heat');
-  heat.innerHTML=answers.map((p,i)=>{
-    const q=QUESTIONS[i];
-    const cat=CATS.find(c=>c.key===q.cat);
-    return `<div class="hc s${p}" style="animation-delay:${i*0.045}s" title="${cat.short}: ${q.q}">
-      <span class="hc-label">${cat.code}</span>
-    </div>`;
-  }).join('');
-
   // 3 categorias com menor média — "ralos" pra maioria, "checagem de escala" pro nível mais alto
   const byCat={};
   CATS.forEach(c=>byCat[c.key]={sum:0,n:0});
   QUESTIONS.forEach((q,i)=>{ byCat[q.cat].sum+=answers[i]; byCat[q.cat].n++; });
   const ranked=CATS.map(c=>({...c, avg: byCat[c.key].sum/byCat[c.key].n})).sort((a,b)=>a.avg-b.avg);
   const worst=ranked.slice(0,3);
+  const worstKeys=worst.map(c=>c.key);
+
+  // Heatmap 4x4 — uma célula por pergunta, rotulada com a sigla da categoria;
+  // células das 3 áreas citadas abaixo ganham um contorno de destaque.
+  const heat=document.getElementById('heat');
+  heat.innerHTML=answers.map((p,i)=>{
+    const q=QUESTIONS[i];
+    const cat=CATS.find(c=>c.key===q.cat);
+    const flagged=worstKeys.includes(q.cat)?' flagged':'';
+    return `<div class="hc s${p}${flagged}" style="animation-delay:${i*0.045}s" title="${cat.short}: ${q.q}">
+      <span class="hc-label">${cat.code}</span>
+    </div>`;
+  }).join('');
 
   if(lvl.scaleReady){
     document.getElementById('leaksTitle').textContent='O que checar antes de escalar';

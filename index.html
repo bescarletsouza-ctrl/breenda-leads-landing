@@ -231,12 +231,11 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // TODO: substitua pelos valores do seu projeto Supabase
-    // (Studio -> Settings -> API -> Project URL / anon public key).
-    // Esses valores são feitos para serem públicos no client-side; a
-    // segurança real vem das políticas de RLS configuradas na tabela "leads".
-    const SUPABASE_URL = "REPLACE_ME_SUPABASE_URL";
-    const SUPABASE_ANON_KEY = "REPLACE_ME_SUPABASE_ANON_KEY";
+    // Valores do projeto Supabase configurados para o formulário.
+    // A URL usada aqui é a base do projeto (sem /rest/v1/), que é o formato
+    // esperado pelo cliente JavaScript do Supabase.
+    const SUPABASE_URL = "https://uuonsedpbsykdjpkjczs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1b25zZWRwYnN5a2RqcGtqY3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQyMDMsImV4cCI6MjA5OTAwMDIwM30.3kgcpos1LhhmPXy8rpeFpmU_miNh4UKdiBZYORENNqg";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

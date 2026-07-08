@@ -543,8 +543,8 @@
       </div>
 
       <div class="leaks">
-        <h3>Seus maiores ralos financeiros</h3>
-        <p class="lead">As áreas com menor pontuação são onde a Base costuma gerar folga financeira mais rápido.</p>
+        <h3 id="leaksTitle">Seus maiores ralos financeiros</h3>
+        <p class="lead" id="leaksLead">As áreas com menor pontuação são onde a Base costuma gerar folga financeira mais rápido.</p>
         <div class="leak-list" id="leakList"></div>
       </div>
 
@@ -645,25 +645,32 @@ const CONFIG = {
 const CATS = [
   { key:"fin", nome:"Gestão Financeira e Precificação", short:"Financeiro & Precificação",
     desc:"controle sobre o caixa, os custos e quanto sobra.",
-    ralo:"Sem controle de caixa e custo real, você precifica no escuro e a margem some sem você perceber." },
+    ralo:"Sem controle de caixa e custo real, você precifica no escuro e a margem some sem você perceber.",
+    scaleTip:"Seu controle financeiro atual foi feito pro volume de hoje — confirme se ele aguenta mais operações, mais clientes e mais gente decidindo, sem perder precisão." },
   { key:"proc", nome:"Processos e Padronização", short:"Processos & Padronização",
     desc:"entregar sempre no mesmo padrão e parar de refazer.",
-    ralo:"Sem processo documentado, cada um faz do seu jeito, o retrabalho vira rotina e o custo dispara." },
+    ralo:"Sem processo documentado, cada um faz do seu jeito, o retrabalho vira rotina e o custo dispara.",
+    scaleTip:"Processos que funcionam com a equipe atual podem travar com o dobro de gente — reveja o que ainda depende só de você antes de crescer." },
   { key:"proj", nome:"Gestão de Projetos e Execução", short:"Projetos & Execução",
     desc:"entregas no prazo e dentro do orçamento.",
-    ralo:"Atrasos e estouros de orçamento corroem a margem e a confiança do cliente a cada entrega." },
+    ralo:"Atrasos e estouros de orçamento corroem a margem e a confiança do cliente a cada entrega.",
+    scaleTip:"Sua capacidade de entrega hoje tem um teto — mapeie qual é esse teto antes de aceitar mais volume do que a operação aguenta." },
   { key:"time", nome:"Produtividade e Gestão de Equipes", short:"Produtividade & Equipes",
     desc:"delegar bem, com metas claras e equipe rendendo.",
-    ralo:"Sem delegação e metas claras, tudo depende de você — e isso limita o tamanho da empresa." },
+    ralo:"Sem delegação e metas claras, tudo depende de você — e isso limita o tamanho da empresa.",
+    scaleTip:"Escalar normalmente significa contratar e delegar mais — confirme se a estrutura de gestão atual segura um time maior sem perder qualidade." },
   { key:"dec", nome:"Tomada de Decisão e Indicadores", short:"Decisão & Indicadores",
     desc:"decidir com números, não no achismo.",
-    ralo:"Decisão na intuição custa caro: sem indicadores, você não enxerga os gargalos que travam o crescimento." },
+    ralo:"Decisão na intuição custa caro: sem indicadores, você não enxerga os gargalos que travam o crescimento.",
+    scaleTip:"Os indicadores que bastam hoje podem não avisar a tempo quando algo quebrar em maior escala — vale revisar o que precisa ser acompanhado mais de perto." },
   { key:"tec", nome:"Tecnologia e Automação (IA)", short:"Tecnologia & IA",
     desc:"usar ferramentas e automação a seu favor.",
-    ralo:"Tarefas manuais e sistemas desconectados consomem horas que poderiam virar lucro." },
+    ralo:"Tarefas manuais e sistemas desconectados consomem horas que poderiam virar lucro.",
+    scaleTip:"Tarefas manuais que hoje cabem no seu tempo tendem a virar gargalo com mais volume — identifique o que precisa ser automatizado antes de escalar." },
   { key:"mkt", nome:"Marketing e Aquisição de Clientes", short:"Marketing & Aquisição",
     desc:"atrair e fechar cliente com método, não na sorte.",
-    ralo:"Sem CAC, LTV e processo de marketing, você gasta para atrair cliente sem saber o retorno." },
+    ralo:"Sem CAC, LTV e processo de marketing, você gasta para atrair cliente sem saber o retorno.",
+    scaleTip:"Aumentar o investimento em aquisição sem confirmar CAC e LTV pode acelerar prejuízo, não lucro — valide esses números antes de pisar no acelerador." },
 ];
 
 const QUESTIONS = [
@@ -767,8 +774,9 @@ const LEVELS = [
     diag:"Sua empresa já tem alguma organização, mas ainda há gargalos e oportunidades reais de otimizar processos e reduzir custos. Você percebe a importância da gestão — falta um método para elevar a eficiência a outro nível.",
     msg:"Você está no caminho certo. Com ajustes estratégicos e um sistema operacional robusto, dá para alcançar um novo patamar de eficiência e lucro. A Base é o parceiro ideal para refinar sua operação e fazer cada centavo trabalhar a seu favor." },
   { min:37, max:48, level:"Operação Eficiente", title:"Operação Eficiente com Potencial de Crescimento Acelerado",
-    diag:"Parabéns: sua empresa já demonstra um bom nível de eficiência. Você tem processos, indicadores e uma gestão que funciona. O desafio agora é escalar esse sucesso e acelerar o crescimento com ainda mais previsibilidade e lucro.",
-    msg:"Sua empresa é exemplo de boa gestão. Para crescer de forma sustentável, a Base oferece estratégias avançadas e implementação de IA para otimizar processos e impulsionar seu marketing, mantendo você sempre à frente da concorrência." },
+    scaleReady:true,
+    diag:"Parabéns: sua empresa já demonstra um bom nível de eficiência. Você tem processos, indicadores e uma gestão que funciona. Agora a pergunta muda: não é mais sobre organizar, é sobre saber se a operação aguenta crescer.",
+    msg:"Ter processos, projetos e financeiro sob controle é o que te trouxe até aqui — mas escalar exige outro olhar: onde a estrutura atual pode travar quando o volume dobrar, e o que precisa mudar operacionalmente antes desse salto. A Base ajuda você a mapear isso e crescer sem repetir os gargalos que trava a maioria das empresas nessa fase." },
 ];
 
 /* ============================================================
@@ -964,18 +972,32 @@ function finish(){
   const heat=document.getElementById('heat');
   heat.innerHTML=answers.map((p,i)=>`<div class="hc s${p} " style="animation-delay:${i*0.045}s"></div>`).join('');
 
-  // Ralos: 3 categorias com menor média
+  // 3 categorias com menor média — "ralos" pra maioria, "checagem de escala" pro nível mais alto
   const byCat={};
   CATS.forEach(c=>byCat[c.key]={sum:0,n:0});
   QUESTIONS.forEach((q,i)=>{ byCat[q.cat].sum+=answers[i]; byCat[q.cat].n++; });
   const ranked=CATS.map(c=>({...c, avg: byCat[c.key].sum/byCat[c.key].n})).sort((a,b)=>a.avg-b.avg);
   const worst=ranked.slice(0,3);
-  document.getElementById('leakList').innerHTML=worst.map(c=>`
-    <div class="leak-item">
-      <div class="cn">${c.short}</div>
-      <h4>${c.avg<=1?'Ralo crítico':(c.avg<2?'Atenção':'Ponto de ajuste')}</h4>
-      <p>${c.ralo}</p>
-    </div>`).join('');
+
+  if(lvl.scaleReady){
+    document.getElementById('leaksTitle').textContent='O que checar antes de escalar';
+    document.getElementById('leaksLead').textContent='Sua operação está pronta pra crescer — essas são as áreas que vale confirmar se aguentam o próximo salto de volume antes de acelerar.';
+    document.getElementById('leakList').innerHTML=worst.map(c=>`
+      <div class="leak-item">
+        <div class="cn">${c.short}</div>
+        <h4>Checagem de escala</h4>
+        <p>${c.scaleTip}</p>
+      </div>`).join('');
+  } else {
+    document.getElementById('leaksTitle').textContent='Seus maiores ralos financeiros';
+    document.getElementById('leaksLead').textContent='As áreas com menor pontuação são onde a Base costuma gerar folga financeira mais rápido.';
+    document.getElementById('leakList').innerHTML=worst.map(c=>`
+      <div class="leak-item">
+        <div class="cn">${c.short}</div>
+        <h4>${c.avg<=1?'Ralo crítico':(c.avg<2?'Atenção':'Ponto de ajuste')}</h4>
+        <p>${c.ralo}</p>
+      </div>`).join('');
+  }
 
   // CTA de agendamento
   const btn=document.getElementById('sessionBtn');

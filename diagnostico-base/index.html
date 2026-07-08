@@ -118,20 +118,20 @@
     .hero-micro{margin-top:18px !important;font-size:14px;justify-content:flex-start}
     .btn--lg{font-size:19px;padding:20px 24px}
 
-    /* botão flutuante de CTA — só na tela inicial, aparece a partir da 2ª dobra */
-    #screen-landing{padding-bottom:88px}
+    /* CTA fixo na tela — só na tela inicial, aparece a partir da 2ª dobra */
+    #screen-landing{padding-bottom:80px}
     .mobile-cta-bar{
       display:block;
       position:fixed;
-      left:20px;right:20px;
-      bottom:calc(18px + env(safe-area-inset-bottom));
+      left:36px;right:36px;
+      bottom:calc(24px + env(safe-area-inset-bottom));
       z-index:50;
       transform:translateY(140%);
       transition:transform .25s ease;
     }
     .mobile-cta-bar.show{transform:translateY(0)}
     .mobile-cta-bar .btn{
-      width:100%;font-size:17px;padding:16px 22px;
+      width:100%;font-size:14.5px;padding:12px 18px;
       box-shadow:0 14px 28px rgba(255,83,16,.35), 0 4px 14px rgba(10,10,10,.18);
     }
   }

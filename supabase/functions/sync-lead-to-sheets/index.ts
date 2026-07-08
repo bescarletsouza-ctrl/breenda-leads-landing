@@ -128,7 +128,7 @@ Deno.serve(async (request: Request) => {
   }
 
   const clientEmail = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  const privateKey = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY");
+  const privateKey = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY")?.replace(/\\n/g, "\n");
   const spreadsheetId = Deno.env.get("GOOGLE_SHEETS_SPREADSHEET_ID");
   const range = Deno.env.get("GOOGLE_SHEETS_RANGE") ?? "Leads!A:I";
 

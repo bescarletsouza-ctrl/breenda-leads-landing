@@ -783,14 +783,22 @@ renderCatGrid();
 
 /* Barra fixa de CTA (mobile): some na 1ª dobra (hero) e na tela do quiz/resultado,
    aparece a partir da 2ª dobra da tela inicial. */
-function updateMobileCta(){
+function updateMobileCta(instant){
   const ctaBar = document.querySelector('.mobile-cta-bar');
   const heroEl = document.querySelector('.hero');
   const landingEl = document.getElementById('screen-landing');
   if(!ctaBar || !heroEl || !landingEl) return;
   const onLanding = landingEl.classList.contains('active');
   const enteringFold2 = heroEl.getBoundingClientRect().bottom <= window.innerHeight * 0.5;
-  ctaBar.classList.toggle('show', onLanding && enteringFold2);
+  const shouldShow = onLanding && enteringFold2;
+  if(instant){
+    ctaBar.style.transition = 'none';
+    ctaBar.classList.toggle('show', shouldShow);
+    void ctaBar.offsetWidth;
+    ctaBar.style.transition = '';
+  } else {
+    ctaBar.classList.toggle('show', shouldShow);
+  }
 }
 window.addEventListener('scroll', updateMobileCta, { passive: true });
 window.addEventListener('resize', updateMobileCta);
@@ -799,7 +807,7 @@ updateMobileCta();
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  updateMobileCta();
+  updateMobileCta(true);
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
 function goHome(){ show('screen-landing'); }

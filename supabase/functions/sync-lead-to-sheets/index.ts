@@ -63,6 +63,7 @@ async function getAccessToken(clientEmail: string, privateKeyPem: string): Promi
   );
   const jwt = `${unsigned}.${base64url(signature)}`;
 
+  console.log("DEBUG antes do fetch pro token endpoint do Google", new Date().toISOString());
   const tokenResponse = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -71,6 +72,7 @@ async function getAccessToken(clientEmail: string, privateKeyPem: string): Promi
       assertion: jwt
     })
   });
+  console.log("DEBUG depois do fetch pro token endpoint", new Date().toISOString(), "status:", tokenResponse.status);
 
   if (!tokenResponse.ok) {
     const text = await tokenResponse.text();
@@ -89,6 +91,7 @@ async function appendToSheet(
 ): Promise<void> {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED`;
 
+  console.log("DEBUG antes do fetch pro Sheets API", new Date().toISOString(), "url:", url);
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -97,6 +100,7 @@ async function appendToSheet(
     },
     body: JSON.stringify({ values: [row] })
   });
+  console.log("DEBUG depois do fetch pro Sheets API", new Date().toISOString(), "status:", response.status);
 
   if (!response.ok) {
     const text = await response.text();
@@ -105,12 +109,15 @@ async function appendToSheet(
 }
 
 Deno.serve(async (request: Request) => {
+  console.log("DEBUG handler invocado", new Date().toISOString(), "method:", request.method);
+
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
   }
 
   const expectedSecret = Deno.env.get("WEBHOOK_SECRET");
   const receivedSecret = request.headers.get("x-webhook-secret");
+  console.log("DEBUG secret check", "esperado definido:", !!expectedSecret, "recebido definido:", !!receivedSecret, "bateu:", receivedSecret === expectedSecret);
   if (expectedSecret && receivedSecret !== expectedSecret) {
     return new Response(JSON.stringify({ error: "Invalid webhook secret" }), { status: 401 });
   }

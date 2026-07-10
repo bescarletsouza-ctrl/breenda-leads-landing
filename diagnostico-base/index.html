@@ -871,6 +871,20 @@ function getUtmParams(){
     const value=params.get(key);
     if(value) out[key]=value;
   });
+
+  // Link de atalho: diagnostico.baseopera.com.br/nome-do-term vira utm_term,
+  // com os demais UTMs no padrao abaixo (ex: link da bio do Instagram).
+  // Query string explicita (?utm_...=) sempre tem prioridade sobre isso.
+  if(!out.utm_term){
+    const pathTerm=window.location.pathname.replace(/^\/+|\/+$/g,'');
+    if(pathTerm){
+      out.utm_term=decodeURIComponent(pathTerm);
+      if(!out.utm_source)out.utm_source='instagram';
+      if(!out.utm_medium)out.utm_medium='social';
+      if(!out.utm_campaign)out.utm_campaign='funil-isca-2026';
+      if(!out.utm_content)out.utm_content='organic';
+    }
+  }
   return out;
 }
 

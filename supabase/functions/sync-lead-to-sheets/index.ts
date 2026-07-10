@@ -13,6 +13,22 @@
 const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 
+function formatDateBR(isoString: string): string {
+  const date = new Date(isoString);
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(date);
+  const map: Record<string, string> = {};
+  parts.forEach((p) => { map[p.type] = p.value; });
+  return `${map.day}/${map.month}/${map.year} ${map.hour}:${map.minute}`;
+}
+
 function base64url(bytes: ArrayBuffer | Uint8Array): string {
   const bin = String.fromCharCode(...new Uint8Array(bytes));
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -174,7 +190,7 @@ Deno.serve(async (request: Request) => {
     record.utm_medium ?? "",
     record.utm_content ?? "",
     record.utm_term ?? "",
-    record.created_at ?? new Date().toISOString()
+    formatDateBR(record.created_at ?? new Date().toISOString())
   ];
 
   try {
